@@ -1,7 +1,12 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="list-group-item clearfix">
-            <h2></h2>
+            <h2>{{contact.name}}</h2>
+            <img 
+            [src]="contact.imageUrl" 
+            alt="{{ contact.name }}" 
+            class="img-responsive"
+            style="max-height: 300px">
             <span class="pull-right">
             <button class="btn btn-primary">Edit</button> 
             <button class="btn btn-danger">Delete</button> 
@@ -12,8 +17,8 @@
 <div class="row">
     <div class="col-xs-12">
         <div class="list-group-item">
-            <p>Email:</p>
-            <p>Phone:</p>
+            <p>Email: {{ contact.email }}</p>
+            <p>Phone: {{ contact.phone }}</p>
         </div>
     </div>
 </div>

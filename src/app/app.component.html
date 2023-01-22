@@ -1,7 +1,9 @@
-<app-header></app-header>
+<app-header (selectedFeatureEvent)="switchView($event)"></app-header>
 <div class="container">
   <div class="row">
     <div class="col-md-12">
+      <app-document></app-document>
+      <app-message-list></app-message-list>
       <app-contacts></app-contacts>
     </div>
   </div>
