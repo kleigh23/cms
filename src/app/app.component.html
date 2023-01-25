@@ -2,9 +2,9 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <app-document></app-document>
-      <app-message-list></app-message-list>
-      <app-contacts></app-contacts>
+      <app-document *ngIf="selectedFeature === 'documents'"></app-document>
+      <app-message-list *ngIf="selectedFeature === 'messages'"></app-message-list>
+      <app-contacts *ngIf="selectedFeature === 'contacts'"></app-contacts>
     </div>
   </div>
 </div>
