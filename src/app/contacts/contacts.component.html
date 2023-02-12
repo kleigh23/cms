@@ -3,9 +3,10 @@
         <app-contact-list></app-contact-list>
     </div>
     <div class="col-md-7">
-        <app-contact-detail
+        <router-outlet></router-outlet>
+        <!-- <app-contact-detail
         *ngIf="selectedContact; else infoText"
-        [contact]="selectedContact"></app-contact-detail>
+        [contact]="selectedContact"></app-contact-detail> -->
         <ng-template #infoText>
             <p>Please select a Contact!</p>
         </ng-template>

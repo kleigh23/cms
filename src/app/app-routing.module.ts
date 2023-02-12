@@ -1,7 +1,27 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { DocumentComponent } from './document/document.component';
+import { MessageListComponent } from './messages/message-list/message-list.component';
+import { ContactsComponent } from './contacts/contacts.component';
+import { DocumentEditComponent } from './document/document-edit/document-edit.component';
+import { DocumentDetailComponent } from './document/document-detail/document-detail.component';
+import { ContactEditComponent } from './contacts/contact-edit/contact-edit.component';
+import { ContactDetailComponent } from './contacts/contact-detail/contact-detail.component';
 
-const routes: Routes = [];
+const routes: Routes = [
+  {path: '', redirectTo: 'documents', pathMatch: 'full'},
+  {path: 'documents', component: DocumentComponent, children: [
+    {path: 'new', component: DocumentEditComponent},
+    {path: ':id', component: DocumentDetailComponent},
+    {path: ':id/edit', component: DocumentEditComponent}
+  ]},
+  {path: 'messages', component: MessageListComponent},
+  {path: 'contacts', component: ContactsComponent, children: [
+    {path: 'new', component: ContactEditComponent},
+    {path: ':id', component: ContactDetailComponent},
+    {path: ':id/edit', component: ContactEditComponent}
+  ]}
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
