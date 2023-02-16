@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Document } from './document.model';
 import { DocumentService } from './document.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-document',
@@ -10,6 +11,7 @@ import { DocumentService } from './document.service';
 })
 export class DocumentComponent implements OnInit {
   selectedDocument: Document;
+  documentList: Document[];
 
   constructor(private documentServices: DocumentService) {}
 
