@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms'
+import { DndModule } from 'ng2-dnd';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,6 +21,8 @@ import { DropdownDirective } from './shared/dropdown.directive';
 import { MessageService } from './messages/message.service';
 import { DocumentEditComponent } from './document/document-edit/document-edit.component';
 import { ContactEditComponent } from './contacts/contact-edit/contact-edit.component';
+import { DocumentService } from './document/document.service';
+import { ContactService } from './contacts/contact.service';
 
 @NgModule({
   declarations: [
@@ -41,9 +45,11 @@ import { ContactEditComponent } from './contacts/contact-edit/contact-edit.compo
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    FormsModule,
+    DndModule.forRoot()
   ],
-  providers: [MessageService],
+  providers: [MessageService, DocumentService, ContactService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

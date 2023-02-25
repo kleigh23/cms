@@ -71,16 +71,19 @@ export class DocumentService {
 
   updateDocument(originalDocument: Document, newDocument: Document) {
     if (!originalDocument || !newDocument) {
+      console.log('null document');
         return
     }
     let pos = this.documents.indexOf(originalDocument);
+    console.log(pos);
     if (pos < 0) {
+      console.log(pos);
         return;
     }
     newDocument.id = originalDocument.id;
     this.documents[pos] = newDocument;
-    let documentsListClone = this.documents.slice();
-    this.documentListChangedEvent.next(documentsListClone);
+    let documentListClone = this.documents.slice();
+    this.documentListChangedEvent.next(documentListClone);
   }
 
   deleteDocument(document: Document) {
