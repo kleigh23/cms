@@ -21,7 +21,7 @@ export class DocumentService {
 
   getDocuments() {
     // return this.documents.slice();
-    this.http.get<Document[]>('https://cms-semester-project-default-rtdb.firebaseio.com/documents.json')
+    this.http.get<Document[]>('http://localhost:3000/documents')
     .subscribe(
       // success method
       (documents: Document[]) => {
@@ -92,48 +92,134 @@ export class DocumentService {
   }
 
   
-  addDocument(newDocument: Document) {
-    if (!newDocument) {
+  // addDocument(newDocument: Document) {
+  //   if (!newDocument) {
+  //     return;
+  //   }
+  //   this.maxDocumentId++;
+  //   newDocument.id = this.maxDocumentId.toString();
+  //   this.documents.push(newDocument);
+  //   let documentsListClone = this.documents.slice();
+  //   // this.documentListChangedEvent.next(documentsListClone);
+  //   this.storeDocuments(newDocument);
+  //   }
+
+  addDocument(document: Document) {
+    if (!document) {
       return;
     }
-    this.maxDocumentId++;
-    newDocument.id = this.maxDocumentId.toString();
-    this.documents.push(newDocument);
-    let documentsListClone = this.documents.slice();
-    // this.documentListChangedEvent.next(documentsListClone);
-    this.storeDocuments(newDocument);
-    }
+
+    // make sure id of the new Document is empty
+    document.id = '';
+
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+
+    // add to database
+    this.http.post<{ message: string, document: Document }>('http://localhost:3000/documents',
+      document,
+      { headers: headers })
+      .subscribe(
+        (responseData) => {
+          // add new document to documents
+          this.documents.push(responseData.document);
+          this.sortAndSend();
+        }
+      );
+  }
+
+  // updateDocument(originalDocument: Document, newDocument: Document) {
+  //   if (!originalDocument || !newDocument) {
+  //     console.log('null document');
+  //       return
+  //   }
+  //   let pos = this.documents.indexOf(originalDocument);
+  //   console.log(pos);
+  //   if (pos < 0) {
+  //     console.log(pos);
+  //       return;
+  //   }
+  //   newDocument.id = originalDocument.id;
+  //   this.documents[pos] = newDocument;
+  //   let documentListClone = this.documents.slice();
+  //   // this.documentListChangedEvent.next(documentListClone);
+  //   this.storeDocuments(newDocument);
+  // }
 
   updateDocument(originalDocument: Document, newDocument: Document) {
     if (!originalDocument || !newDocument) {
-      console.log('null document');
-        return
+      return;
     }
-    let pos = this.documents.indexOf(originalDocument);
-    console.log(pos);
+
+    const pos = this.documents.findIndex(d => d.id === originalDocument.id);
+
     if (pos < 0) {
-      console.log(pos);
-        return;
+      return;
     }
+
+    // set the id of the new Document to the id of the old Document
     newDocument.id = originalDocument.id;
-    this.documents[pos] = newDocument;
-    let documentListClone = this.documents.slice();
-    // this.documentListChangedEvent.next(documentListClone);
-    this.storeDocuments(newDocument);
+    // newDocument._id = originalDocument._id;
+
+    const headers = new HttpHeaders({'Content-Type': 'application/json'});
+
+    // update database
+    this.http.put('http://localhost:3000/documents/' + originalDocument.id,
+      newDocument, { headers: headers })
+      .subscribe(
+        (documents) => {
+          this.documents[pos] = newDocument;
+          this.sortAndSend();
+        }
+      );
   }
 
-  deleteDocument(document: Document) {
-    if (!document) {
-        return;
+//   deleteDocument(document: Document) {
+//     if (!document) {
+//         return;
+//     }
+//     const pos = this.documents.indexOf(document);
+//     if (pos < 0) {
+//         return;
+//     }
+//     this.documents.splice(pos, 1);
+//     let documentsListClone = this.documents.slice();
+//     // this.documentListChangedEvent.next(documentsListClone);
+//     this.storeDocuments(document);
+// }
+
+deleteDocument(document: Document) {
+
+  if (!document) {
+    return;
+  }
+
+  const pos = this.documents.findIndex(d => d.id === document.id);
+
+  if (pos < 0) {
+    return;
+  }
+
+  // delete from database
+  this.http.delete('http://localhost:3000/documents/' + document.id)
+    .subscribe(
+      (documents) => {
+        this.documents.splice(pos, 1);
+        this.sortAndSend();
+      }
+    );
+}
+
+sortAndSend(){
+  this.documents.sort((a,b)=>{
+    if (a.name < b.name) {
+      return -1;
     }
-    const pos = this.documents.indexOf(document);
-    if (pos < 0) {
-        return;
+    if (a.name > b.name) {
+      return 1;
     }
-    this.documents.splice(pos, 1);
-    let documentsListClone = this.documents.slice();
-    // this.documentListChangedEvent.next(documentsListClone);
-    this.storeDocuments(document);
+    return 0;
+  });
+  this.documentListChangedEvent.next(this.documents.slice())
 }
 
 }

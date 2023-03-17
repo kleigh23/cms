@@ -5,6 +5,7 @@ var http = require('http');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
 
 // import the routing file to handle the default (index) route
 var index = require('./server/routes/app');
@@ -58,6 +59,18 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/cms/index.html'));
 });
 
+// establish a connection to the mongo database
+mongoose.connect('mongodb://127.0.0.1:27017/cms',
+   { useNewUrlParser: true }, (err, res) => {
+      if (err) {
+         console.log('Connection failed: ' + err);
+      }
+      else {
+         console.log('Connected to database!');
+      }
+   }
+);
+
 // Define the port address and tell express to use this port
 const port = process.env.PORT || '3000';
 app.set('port', port);
@@ -69,3 +82,68 @@ const server = http.createServer(app);
 server.listen(port, function() {
   console.log('API running on localhost: ' + port)
 });
+
+
+// sequence generator file
+var Sequence = require('./server/models/sequence');
+
+var maxDocumentId;
+var maxMessageId;
+var maxContactId;
+var sequenceId = null;
+
+function SequenceGenerator() {
+
+  Sequence.findOne()
+    .exec(function(err, sequence) {
+      if (err) {
+        return res.status(500).json({
+          title: 'An error occurred',
+          error: err
+        });
+      }
+
+      sequenceId = sequence._id;
+      maxDocumentId = sequence.maxDocumentId;
+      maxMessageId = sequence.maxMessageId;
+      maxContactId = sequence.maxContactId;
+    });
+}
+
+SequenceGenerator.prototype.nextId = function(collectionType) {
+
+  var updateObject = {};
+  var nextId;
+
+  switch (collectionType) {
+    case 'documents':
+      maxDocumentId++;
+      updateObject = {maxDocumentId: maxDocumentId};
+      nextId = maxDocumentId;
+      break;
+    case 'messages':
+      maxMessageId++;
+      updateObject = {maxMessageId: maxMessageId};
+      nextId = maxMessageId;
+      break;
+    case 'contacts':
+      maxContactId++;
+      updateObject = {maxContactId: maxContactId};
+      nextId = maxContactId;
+      break;
+    default:
+      return -1;
+  }
+
+  Sequence.update({_id: sequenceId}, {$set: updateObject},
+    function(err) {
+      if (err) {
+        console.log("nextId error = " + err);
+        return null
+      }
+    });
+
+  return nextId;
+}
+
+module.exports = new SequenceGenerator();
